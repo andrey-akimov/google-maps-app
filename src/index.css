@@ -1,35 +1,45 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+	overflow-y: hidden;
 }
 
-.menu{
-  position: fixed;
-  top: 0;
-  z-index: 1000;
-  padding: 0;
-  width: 100%;
+.center {
+	text-align: center;
 }
 
-.menu .active{
-  font-weight: bold;
+.menu {
+	position: fixed;
+	top: 0;
+	z-index: 1000;
+	padding: 0;
+	width: 100%;
 }
 
-.menu ul{
-  list-style: none;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  vertical-align: middle;
+.menu .active {
+	font-weight: bold;
 }
 
-.menu a{
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #fff;
+.menu ul {
+	list-style: none;
+	text-align: center;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
 }
 
-.ui.centered.middle.aligned.four.column.grid{
-  height: 100vh;
+.menu a {
+	display: inline-block;
+	padding: 10px 20px;
+	background-color: #fff;
+}
+
+.ui.centered.middle.aligned.four.column.grid {
+	height: 100vh;
+}
+
+.column {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
 }

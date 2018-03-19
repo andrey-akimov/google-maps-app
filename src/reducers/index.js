@@ -1,8 +1,10 @@
 const initialState = [
 	{
+		id: 1,
 		login: 'dodo19',
 		markers: [
 			{
+				id: 1,
 				location: {
 					lat: 11,
 					lng: 22
@@ -10,6 +12,7 @@ const initialState = [
 				label: 'just string'
 			},
 			{
+				id: 2,
 				location: {
 					lat: 12,
 					lng: 23
@@ -19,9 +22,11 @@ const initialState = [
 		]
 	},
 	{
+		id: 2,
 		login: 'coco11',
 		markers: [
 			{
+				id: 3,
 				location: {
 					lat: 21,
 					lng: 32
@@ -29,6 +34,7 @@ const initialState = [
 				label: 'just string - 3'
 			},
 			{
+				id: 4,
 				location: {
 					lat: -12,
 					lng: -23

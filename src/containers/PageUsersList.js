@@ -1,38 +1,43 @@
 import React, { Component } from 'react';
-import { compose, withProps } from 'recompose';
-import {
-	withScriptjs,
-	withGoogleMap,
-	GoogleMap,
-	Marker
-} from 'react-google-maps';
 import { connect } from 'react-redux';
-
-const MapWithMarkers = compose(
-	withProps({
-		googleMapURL:
-			'https://maps.googleapis.com/maps/api/js?key=AIzaSyBoq27kZ_DpT-WyKHrMn4WNvvTc-weMvc4&v=3.exp&libraries=geometry,drawing,places',
-		loadingElement: <div style={{ height: `100%` }} />,
-		containerElement: <div style={{ height: `100vh` }} />,
-		mapElement: <div style={{ height: `100%` }} />
-	}),
-	withScriptjs,
-	withGoogleMap
-)(props => (
-	<GoogleMap defaultZoom={10} defaultCenter={{ lat: 46.469, lng: 30.74 }}>
-		<Marker
-			onDrag={() => console.log(111)}
-			label={'ololoshada a asdhfa s'}
-			defaultDraggable
-			position={{ lat: 46.469, lng: 30.74 }}
-		/>
-	</GoogleMap>
-));
+import { Grid, Image, List } from 'semantic-ui-react';
+import Map from '../components/Map';
 
 class PageUsersList extends Component {
+	state = { markers: [] };
+
+	onUserClick = id => {
+		let curentUser = this.props.state.filter(user => user.id === id)[0].markers;
+		this.setState({ markers: curentUser });
+		console.log('curentUser', curentUser);
+	};
+
 	render() {
-		console.log(this.props.state);
-		return <MapWithMarkers />;
+		const usersList = this.props.state;
+
+		return (
+			<Grid columns="equal">
+				<Grid.Row>
+					<Grid.Column width={14}>
+						<Map markers={this.state} />
+					</Grid.Column>
+					<Grid.Column color="black">
+						<h3 className="center">Users list:</h3>
+						{usersList.length > 0 ? (
+							<ul>
+								{usersList.map(user => (
+									<li key={user.id} onClick={() => this.onUserClick(user.id)}>
+										{user.login}
+									</li>
+								))}
+							</ul>
+						) : (
+							<p className="center">There are no users :(</p>
+						)}
+					</Grid.Column>
+				</Grid.Row>
+			</Grid>
+		);
 	}
 }
 
