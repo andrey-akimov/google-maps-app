@@ -5,17 +5,17 @@ const initialState = [
 		markers: [
 			{
 				id: 1,
-				location: {
-					lat: 11,
-					lng: 22
+				position: {
+					lat: 46.469,
+					lng: 30.74
 				},
 				label: 'just string'
 			},
 			{
 				id: 2,
-				location: {
-					lat: 12,
-					lng: 23
+				position: {
+					lat: 46.439,
+					lng: 30.72
 				},
 				label: 'just string - 2'
 			}
@@ -27,17 +27,17 @@ const initialState = [
 		markers: [
 			{
 				id: 3,
-				location: {
-					lat: 21,
-					lng: 32
+				position: {
+					lat: 46.409,
+					lng: 30.7
 				},
 				label: 'just string - 3'
 			},
 			{
 				id: 4,
-				location: {
-					lat: -12,
-					lng: -23
+				position: {
+					lat: 46.55,
+					lng: 30.74
 				},
 				label: 'just string - 4'
 			}
@@ -47,8 +47,13 @@ const initialState = [
 
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
-		case 'GET_USERS':
-			return state;
+		// case 'GET_USERS':
+		// 	alert('zzzz');
+		// 	return state;
+
+		case 'ADD_LOCATION':
+			console.log(action);
+			return [...state, action.payload];
 
 		default:
 			return state;
