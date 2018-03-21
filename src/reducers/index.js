@@ -47,13 +47,24 @@ const initialState = [
 
 const reducer = (state = initialState, action) => {
 	switch (action.type) {
-		// case 'GET_USERS':
-		// 	alert('zzzz');
-		// 	return state;
-
 		case 'ADD_LOCATION':
-			console.log(action);
-			return [...state, action.payload];
+			const isInState = state.find(user => user.id === action.payload.id);
+			if (!isInState) {
+				return [...state, action.payload];
+			}
+			return state.map(user => {
+				if (action.payload.id === user.id) {
+					return {
+						...user,
+						markers: [
+							...user.markers,
+							action.payload.markers[action.payload.markers.length - 1]
+						]
+					};
+				} else {
+					return user;
+				}
+			});
 
 		default:
 			return state;

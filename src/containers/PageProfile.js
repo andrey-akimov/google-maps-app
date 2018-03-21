@@ -29,17 +29,17 @@ class Map extends Component {
 	componentWillUpdate(nextProps, nextState) {
 		let geocoder = new window.google.maps.Geocoder();
 		if (nextState.markers.length > 0) {
-			var lastLocation = nextState.markers[nextState.markers.length - 1].position;
+			var lastMarker = nextState.markers[nextState.markers.length - 1];
 		} else {
 			return false;
 		}
-		geocoder.geocode({ location: lastLocation }, function(results, status) {
+		geocoder.geocode({ location: lastMarker.position }, function(results, status) {
 			if (status === 'OK') {
-				nextProps.addLocation(
+				lastMarker.label =
 					results[0].address_components[1] !== undefined
 						? results[0].address_components[1].short_name
-						: results[0].address_components[0].short_name
-				);
+						: results[0].address_components[0].short_name;
+				nextProps.addLocation(nextState);
 			} else {
 				console.log('Geocode was not successful for the following reason: ' + status);
 			}
@@ -74,7 +74,7 @@ const MapWithGeocode = compose(
 )(Map);
 
 const mapDispatchToProps = dispatch => ({
-	addLocation: () => dispatch(addLocation())
+	addLocation: data => dispatch(addLocation(data))
 });
 
 export default connect(null, mapDispatchToProps)(MapWithGeocode);
