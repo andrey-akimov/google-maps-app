@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { Grid } from 'semantic-ui-react';
 import { compose, withProps } from 'recompose';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
+import axios from 'axios';
+import { getUsers } from '../actions';
 
 const Map = compose(
 	withProps({
@@ -17,10 +19,10 @@ const Map = compose(
 )(props => {
 	return (
 		<GoogleMap defaultZoom={10} defaultCenter={{ lat: 46.469, lng: 30.74 }}>
-			{props.markers.markers.length === 0
+			{props.markers.length === 0
 				? null
-				: props.markers.markers.map(marker => (
-						<Marker key={marker.id} label={marker.label} position={marker.position} />
+				: props.markers.map(marker => (
+						<Marker key={marker._id} label={marker.label} position={marker.position} />
 				  ))}
 		</GoogleMap>
 	);
@@ -30,25 +32,38 @@ class PageUsersList extends Component {
 	state = { markers: [] };
 
 	onUserClick = id => {
-		let curentUser = this.props.state.filter(user => user.id === id)[0].markers;
+		let curentUser = this.props.state.filter(user => user._id === id)[0].markers;
 		this.setState({ markers: curentUser });
 	};
 
+	componentDidMount() {
+		this.props.getUsers();
+
+		// axios
+		// 	.get('http://localhost:8000/')
+		// 	.then(res => {
+		// 		console.log(res.data);
+		// 	})
+		// 	.catch(err => {
+		// 		console.log('Request error');
+		// 	});
+	}
+
 	render() {
 		const usersList = this.props.state;
-
+		console.log(usersList);
 		return (
 			<Grid columns="equal">
 				<Grid.Row>
 					<Grid.Column width={14}>
-						<Map markers={this.state} />
+						<Map markers={this.state.markers} />
 					</Grid.Column>
 					<Grid.Column color="black">
 						<h3 className="center">Users list:</h3>
 						{usersList.length > 0 ? (
 							<ul>
 								{usersList.map(user => (
-									<li key={user.id} onClick={() => this.onUserClick(user.id)}>
+									<li key={user._id} onClick={() => this.onUserClick(user._id)}>
 										{user.login}
 									</li>
 								))}
@@ -67,4 +82,23 @@ const mapStateToProps = state => ({
 	state: state
 });
 
-export default connect(mapStateToProps)(PageUsersList);
+const mapDispatchToProps = dispatch => ({
+	getUsers: () => {
+		axios
+			.get('http://localhost:8000/')
+			.then(res => {
+				dispatch({
+					type: 'GET_USERS',
+					payload: res.data
+				});
+			})
+			.catch(err => {
+				dispatch({
+					type: 'GET_USERS_REJECTED',
+					payload: 'Request error'
+				});
+			});
+	}
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PageUsersList);
