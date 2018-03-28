@@ -61,3 +61,22 @@ app.post('/registration', (req, res) => {
 		});
 	});
 });
+
+app.post('/login', (req, res) => {
+	NewUser.findOne({ login: req.body.login }, (err, docs) => {
+		if (err) {
+			return res.send(err);
+		}
+
+		if (!!docs) {
+			bcrypt.compare(req.body.password, docs.password).then(function(result) {
+				if (result) {
+					return res.json({ res: 'ok' });
+				}
+				return res.json({ res: 'err' });
+			});
+		} else {
+			return res.json({ res: 'err' });
+		}
+	});
+});

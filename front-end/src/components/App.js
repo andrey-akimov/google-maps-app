@@ -2,16 +2,17 @@ import React from 'react';
 import Menu from './Menu';
 import PageAbout from './PageAbout';
 import PageAuthentication from './PageAuthentication';
-import PageLogin from './PageLogin';
-import PageRegistration from './PageRegistration';
+import PageLogin from '../containers/PageLogin';
+import PageRegistration from '../containers/PageRegistration';
 import PageProfile from '../containers/PageProfile';
 import PageUsersList from '../containers/PageUsersList';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Router, Switch, Route } from 'react-router-dom';
+import history from '../history';
 
 const App = () => {
 	return (
 		<div>
-			<Router>
+			<Router history={history}>
 				<div>
 					<Menu />
 					<Switch>

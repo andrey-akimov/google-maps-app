@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
-import { Button, Form, Grid, Header, Message, Segment, Loader } from 'semantic-ui-react';
+import {
+	Button,
+	Form,
+	Grid,
+	Header,
+	Message,
+	Segment,
+	Loader,
+	Modal,
+	Icon
+} from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import history from '../history';
 
 class PageRegistration extends Component {
 	// STATE
@@ -9,7 +20,9 @@ class PageRegistration extends Component {
 		login: '',
 		password1: '',
 		password2: '',
-		loading: false
+		loading: false,
+		userExist: false,
+		modalOpen: false
 	};
 
 	// CHECK PASSWORDS
@@ -30,6 +43,7 @@ class PageRegistration extends Component {
 	};
 
 	// HANDLERS
+	handleClose = () => this.setState({ modalOpen: false });
 	loginHandler = e => {
 		this.setState({ login: e.target.value });
 	};
@@ -51,9 +65,14 @@ class PageRegistration extends Component {
 					password
 				})
 				.then(res => {
-					// return res.data !== '' ? false : true;
-					this.setState({ loading: false });
 					console.log(res.data);
+					res.data.res === 'saved'
+						? history.push('/profile')
+						: this.setState({
+								loading: false,
+								userExist: true,
+								modalOpen: true
+						  });
 				})
 				.catch(err => console.log(err));
 		}
@@ -62,16 +81,11 @@ class PageRegistration extends Component {
 	// RENDER
 	render() {
 		return this.state.loading ? (
+			// LOADER
 			<Loader style={{ marginTop: '50vh' }} size="huge" active inline="centered" />
 		) : (
+			// PAGE CONTENT
 			<div className="login-form">
-				<style>{`
-					body > div,
-					body > div > div,
-					body > div > div > div.login-form {
-						height: 100%;
-					}
-				`}</style>
 				<Grid textAlign="center" style={{ height: '100vh' }} verticalAlign="middle">
 					<Grid.Column style={{ maxWidth: 450 }}>
 						<Header as="h2" color="teal" textAlign="center">
@@ -117,6 +131,8 @@ class PageRegistration extends Component {
 								</Button>
 							</Segment>
 						</Form>
+
+						{/* MESSSAGES */}
 						<Message>
 							Are you already registered? <Link to="/login">Login</Link>
 						</Message>
@@ -129,6 +145,30 @@ class PageRegistration extends Component {
 						)}
 					</Grid.Column>
 				</Grid>
+
+				{/* MODAL */}
+				{this.state.userExist ? (
+					<Modal
+						open={this.state.modalOpen}
+						onClose={this.handleClose}
+						basic
+						size="small"
+						style={{ paddingTop: '40vh', margin: '0 auto 0 auto', marginTop: '0' }}
+					>
+						<Header icon="close" content="Try another login" style={{ color: 'red' }} />
+						<Modal.Content>
+							<h2>
+								A user with the login{' '}
+								<b style={{ color: 'red' }}>{this.state.login}</b> already exist
+							</h2>
+						</Modal.Content>
+						<Modal.Actions>
+							<Button color="green" onClick={this.handleClose} inverted>
+								<Icon name="checkmark" /> Got it
+							</Button>
+						</Modal.Actions>
+					</Modal>
+				) : null}
 			</div>
 		);
 	}
