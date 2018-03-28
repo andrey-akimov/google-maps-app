@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
 const User = require('./models/user');
+const NewUser = require('./models/newUser');
 const mongoose = require('./db/mongoose');
 
 app.use(bodyParser.json());
@@ -27,5 +29,35 @@ app.get('/', (req, res) => {
 			return res.send(err);
 		}
 		return res.send(docs);
+	});
+});
+
+// POST
+app.post('/registration', (req, res) => {
+	NewUser.findOne({ login: req.body.login }, (err, docs) => {
+		if (err) {
+			return res.send(err);
+		}
+
+		if (!!docs) {
+			return res.json({ res: 'exist' });
+		}
+
+		// Hashing a password
+		bcrypt.hash(req.body.password, 2).then(function(hash) {
+			const newUser = new NewUser({
+				login: req.body.login,
+				password: hash,
+				markers: []
+			});
+
+			newUser.save(err => {
+				if (err) {
+					return console.log(err);
+				}
+				// return true;
+				return res.json({ res: 'saved' });
+			});
+		});
 	});
 });

@@ -4,7 +4,7 @@ import { Grid } from 'semantic-ui-react';
 import { compose, withProps } from 'recompose';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 import axios from 'axios';
-import { getUsers } from '../actions';
+// import { getUsers } from '../actions';
 
 const Map = compose(
 	withProps({
