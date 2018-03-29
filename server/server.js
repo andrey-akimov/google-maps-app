@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('./models/user');
 const NewUser = require('./models/newUser');
@@ -32,6 +33,15 @@ app.get('/', (req, res) => {
 	});
 });
 
+app.get('/map', verifyToken, (req, res) => {
+	jwt.verify(req.token, 'seckretkey', (err, authData) => {
+		if (err) {
+			console.log(err);
+		}
+		res.json({ authData });
+	});
+});
+
 // POST
 app.post('/registration', (req, res) => {
 	NewUser.findOne({ login: req.body.login }, (err, docs) => {
@@ -55,8 +65,15 @@ app.post('/registration', (req, res) => {
 				if (err) {
 					return console.log(err);
 				}
-				// return true;
-				return res.json({ res: 'saved' });
+				// JWT
+				jwt.sign({ login: req.body.login }, 'secretkey', (err, token) => {
+					if (err) {
+						return console.log(err);
+					}
+					console.log(token);
+					res.header({ Authorization: 'Bearer ' + token });
+					return res.json({ res: 'saved' });
+				});
 			});
 		});
 	});
@@ -69,14 +86,44 @@ app.post('/login', (req, res) => {
 		}
 
 		if (!!docs) {
+			// Hashing a password
 			bcrypt.compare(req.body.password, docs.password).then(function(result) {
 				if (result) {
-					return res.json({ res: 'ok' });
+					// JWT
+					jwt.sign({ login: req.body.login }, 'secretkey', (err, token) => {
+						if (err) {
+							return console.log(err);
+						}
+						console.log(token);
+						res.header({ Authorization: 'Bearer ' + token });
+						return res.json({ res: 'ok' });
+					});
+				} else {
+					return res.json({ res: 'err' });
 				}
-				return res.json({ res: 'err' });
 			});
 		} else {
 			return res.json({ res: 'err' });
 		}
 	});
 });
+
+// verifyToken
+function verifyToken(req, res, next) {
+	// Get auth header value
+	const bearerHeader = req.headers['authorization'];
+	// Check if bearer is undefined
+	if (typeof bearerHeader !== 'undefined') {
+		// Split at the space
+		const bearer = bearerHeader.split(' ');
+		// Get token from array
+		const bearerToken = bearer[1];
+		// Set token
+		req.token = bearerToken;
+		// Next middleware
+		next();
+	} else {
+		// Forbidden
+		res.sendStatus(403);
+	}
+}

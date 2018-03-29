@@ -9,7 +9,7 @@ const Menu = () => {
 					Main
 				</NavLink>
 				<NavLink to="/authentication">Authentication</NavLink>
-				<NavLink to="/profile">Profile</NavLink>
+				<NavLink to="/map">Map</NavLink>
 				<NavLink to="/about">About</NavLink>
 			</ul>
 		</nav>

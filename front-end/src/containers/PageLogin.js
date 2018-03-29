@@ -38,7 +38,7 @@ class PageLogin extends Component {
 				.then(res => {
 					console.log(res.data);
 					res.data.res === 'ok'
-						? history.push('/profile')
+						? history.push('/map')
 						: this.setState({
 								loading: false,
 								error: true

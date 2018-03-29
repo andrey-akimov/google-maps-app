@@ -67,7 +67,7 @@ class PageRegistration extends Component {
 				.then(res => {
 					console.log(res.data);
 					res.data.res === 'saved'
-						? history.push('/profile')
+						? history.push('/map')
 						: this.setState({
 								loading: false,
 								userExist: true,

@@ -4,7 +4,7 @@ import PageAbout from './PageAbout';
 import PageAuthentication from './PageAuthentication';
 import PageLogin from '../containers/PageLogin';
 import PageRegistration from '../containers/PageRegistration';
-import PageProfile from '../containers/PageProfile';
+import PageMap from '../containers/PageMap';
 import PageUsersList from '../containers/PageUsersList';
 import { Router, Switch, Route } from 'react-router-dom';
 import history from '../history';
@@ -17,7 +17,7 @@ const App = () => {
 					<Menu />
 					<Switch>
 						<Route exact path="/" component={PageUsersList} />
-						<Route path="/profile" component={PageProfile} />
+						<Route path="/map" component={PageMap} />
 						<Route path="/authentication" component={PageAuthentication} />
 						<Route path="/about" component={PageAbout} />
 						<Route path="/login" component={PageLogin} />
