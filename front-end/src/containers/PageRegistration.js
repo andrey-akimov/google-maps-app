@@ -66,13 +66,16 @@ class PageRegistration extends Component {
 				})
 				.then(res => {
 					console.log(res.data);
-					res.data.res === 'saved'
-						? history.push('/map')
-						: this.setState({
-								loading: false,
-								userExist: true,
-								modalOpen: true
-						  });
+					if (res.data.res === 'saved') {
+						this.props.auth();
+						history.push('/map');
+					} else {
+						this.setState({
+							loading: false,
+							userExist: true,
+							modalOpen: true
+						});
+					}
 				})
 				.catch(err => console.log(err));
 		}

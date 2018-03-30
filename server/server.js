@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const User = require('./models/user');
 const NewUser = require('./models/newUser');
 const mongoose = require('./db/mongoose');
 
@@ -25,7 +24,7 @@ app.listen(8000, () => {
 
 // GET
 app.get('/', (req, res) => {
-	User.find({}, (err, docs) => {
+	NewUser.find({}, '_id login markers', (err, docs) => {
 		if (err) {
 			return res.send(err);
 		}
@@ -34,11 +33,18 @@ app.get('/', (req, res) => {
 });
 
 app.get('/map', verifyToken, (req, res) => {
-	jwt.verify(req.token, 'seckretkey', (err, authData) => {
+	jwt.verify(req.token, 'secretkey', (err, authData) => {
 		if (err) {
-			console.log(err);
+			return res.json({ res: 'err' });
 		}
-		res.json({ authData });
+
+		NewUser.findById(authData._id, 'markers', (err, docs) => {
+			if (!!docs) {
+				return res.json({ docs, res: 'ok' });
+			} else {
+				return res.json({ res: 'err' });
+			}
+		});
 	});
 });
 
@@ -61,17 +67,16 @@ app.post('/registration', (req, res) => {
 				markers: []
 			});
 
-			newUser.save(err => {
+			newUser.save((err, product) => {
 				if (err) {
 					return console.log(err);
 				}
 				// JWT
-				jwt.sign({ login: req.body.login }, 'secretkey', (err, token) => {
+				jwt.sign({ _id: product._id }, 'secretkey', (err, token) => {
 					if (err) {
 						return console.log(err);
 					}
-					console.log(token);
-					res.header({ Authorization: 'Bearer ' + token });
+					// console.log(token);
 					return res.json({ res: 'saved' });
 				});
 			});
@@ -90,13 +95,12 @@ app.post('/login', (req, res) => {
 			bcrypt.compare(req.body.password, docs.password).then(function(result) {
 				if (result) {
 					// JWT
-					jwt.sign({ login: req.body.login }, 'secretkey', (err, token) => {
+					jwt.sign({ _id: docs._id }, 'secretkey', (err, token) => {
 						if (err) {
 							return console.log(err);
 						}
-						console.log(token);
-						res.header({ Authorization: 'Bearer ' + token });
-						return res.json({ res: 'ok' });
+						// console.log(token);
+						return res.json({ res: 'ok', authorization: 'Bearer ' + token });
 					});
 				} else {
 					return res.json({ res: 'err' });
@@ -108,22 +112,33 @@ app.post('/login', (req, res) => {
 	});
 });
 
+app.post('/map', verifyToken, (req, res) => {
+	jwt.verify(req.token, 'secretkey', (err, authData) => {
+		if (err) {
+			return res.json({ res: 'err' });
+		}
+
+		NewUser.findById(authData._id, (err, docs) => {
+			if (!!docs) {
+				docs.markers.push(req.body.marker);
+				docs.save();
+				return res.json({ docs, res: 'ok' });
+			} else {
+				return res.json({ res: 'err' });
+			}
+		});
+	});
+});
+
 // verifyToken
 function verifyToken(req, res, next) {
-	// Get auth header value
-	const bearerHeader = req.headers['authorization'];
-	// Check if bearer is undefined
-	if (typeof bearerHeader !== 'undefined') {
-		// Split at the space
-		const bearer = bearerHeader.split(' ');
-		// Get token from array
+	const bearerStr = req.body.token || req.query.token;
+	if (typeof bearerStr !== 'undefined') {
+		const bearer = bearerStr.split(' ');
 		const bearerToken = bearer[1];
-		// Set token
 		req.token = bearerToken;
-		// Next middleware
 		next();
 	} else {
-		// Forbidden
 		res.sendStatus(403);
 	}
 }

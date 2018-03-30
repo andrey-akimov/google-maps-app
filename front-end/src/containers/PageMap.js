@@ -3,43 +3,37 @@ import { connect } from 'react-redux';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 import { Button, Modal, Input } from 'semantic-ui-react';
 import { compose, withProps } from 'recompose';
-import { addLocation } from '../actions';
+import axios from 'axios';
 
 class Map extends Component {
 	state = {
 		open: false,
 		input: '',
-		user: {
-			id: Date.now(),
-			login: 'user' + Date.now(),
-			markers: []
-		}
+		markers: []
 	};
 
 	close = () => {
-		this.state.user.markers[this.state.user.markers.length - 1].label = this.state.input;
+		const lastMarker = this.state.markers[this.state.markers.length - 1];
+		lastMarker.label = this.state.input;
 		this.setState({ open: false });
 
-		// this.setState({
-		// 	...this.state,
-		// 	user: {
-		// 		...this.state.user,
-		// 		markers: this.state.user.markers.map((marker, i, arr) => {
-		// 			if (arr.length - 1 === i) {
-		// 				return {
-		// 					...marker,
-		// 					label: this.state.input
-		// 				};
-		// 			} else {
-		// 				return marker;
-		// 			}
-		// 		})
-		// 	},
-		// 	open: false
-		// });
-		// console.log(this.state);
-
-		this.props.addLocation(this.state.user);
+		axios
+			.post('http://localhost:8000/map', {
+				token: localStorage.getItem('jwt'),
+				marker: {
+					position: {
+						lat: lastMarker.position.lat,
+						lng: lastMarker.position.lng
+					},
+					label: lastMarker.label
+				}
+			})
+			.then(res => {
+				if (res.data.res === 'ok') {
+					this.setState({ markers: res.data.docs.markers });
+				}
+			})
+			.catch(err => console.log(err));
 	};
 
 	onChange = e => {
@@ -59,20 +53,16 @@ class Map extends Component {
 						: results[0].address_components[0].short_name;
 
 				this.setState({
-					...this.state,
 					input: label,
 					open: true,
-					user: {
-						...this.state.user,
-						markers: [
-							...this.state.user.markers,
-							{
-								position,
-								id: Date.now(),
-								label
-							}
-						]
-					}
+					markers: [
+						...this.state.markers,
+						{
+							position,
+							_id: Date.now(),
+							label
+						}
+					]
 				});
 			} else {
 				console.log('Geocode was not successful for the following reason: ' + status);
@@ -80,9 +70,21 @@ class Map extends Component {
 		});
 	};
 
+	componentDidMount() {
+		axios
+			.get('http://localhost:8000/map', {
+				params: { token: localStorage.getItem('jwt') }
+			})
+			.then(res => {
+				if (res.data.res === 'ok') {
+					this.setState({ markers: res.data.docs.markers });
+				}
+			})
+			.catch(err => console.log(err));
+	}
+
 	render() {
-		const { open } = this.state;
-		const { markers } = this.state.user;
+		const { open, markers } = this.state;
 		return (
 			<div>
 				<Modal
@@ -118,8 +120,8 @@ class Map extends Component {
 					defaultZoom={10}
 					defaultCenter={{ lat: 46.469, lng: 30.74 }}
 				>
-					{this.state.user.markers.map(marker => (
-						<Marker key={marker.id} label={marker.label} position={marker.position} />
+					{this.state.markers.map(marker => (
+						<Marker key={marker._id} label={marker.label} position={marker.position} />
 					))}
 				</GoogleMap>
 			</div>
@@ -139,8 +141,4 @@ const MapWithGeocode = compose(
 	withGoogleMap
 )(Map);
 
-const mapDispatchToProps = dispatch => ({
-	addLocation: data => dispatch(addLocation(data))
-});
-
-export default connect(null, mapDispatchToProps)(MapWithGeocode);
+export default connect()(MapWithGeocode);

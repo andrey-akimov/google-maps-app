@@ -37,12 +37,16 @@ class PageLogin extends Component {
 				})
 				.then(res => {
 					console.log(res.data);
-					res.data.res === 'ok'
-						? history.push('/map')
-						: this.setState({
-								loading: false,
-								error: true
-						  });
+					if (res.data.res === 'ok') {
+						localStorage.setItem('jwt', res.data.authorization);
+						this.props.auth();
+						history.push('/map');
+					} else {
+						this.setState({
+							loading: false,
+							error: true
+						});
+					}
 				})
 				.catch(err => console.log(err));
 		}
