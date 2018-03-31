@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 import { Button, Modal, Input } from 'semantic-ui-react';
 import { compose, withProps } from 'recompose';
@@ -12,9 +11,8 @@ class Map extends Component {
 		markers: []
 	};
 
-	close = () => {
+	closeHandler = () => {
 		const lastMarker = this.state.markers[this.state.markers.length - 1];
-		lastMarker.label = this.state.input;
 		this.setState({ open: false });
 
 		axios
@@ -25,7 +23,7 @@ class Map extends Component {
 						lat: lastMarker.position.lat,
 						lng: lastMarker.position.lng
 					},
-					label: lastMarker.label
+					label: this.state.input
 				}
 			})
 			.then(res => {
@@ -36,7 +34,7 @@ class Map extends Component {
 			.catch(err => console.log(err));
 	};
 
-	onChange = e => {
+	onChangeHandler = e => {
 		this.setState({ input: e.target.value });
 	};
 
@@ -70,6 +68,7 @@ class Map extends Component {
 		});
 	};
 
+	// CDM
 	componentDidMount() {
 		axios
 			.get('http://localhost:8000/map', {
@@ -91,9 +90,9 @@ class Map extends Component {
 					style={{ height: '100vh' }}
 					dimmer={'blurring'}
 					open={open}
-					onClose={this.close}
+					onClose={this.closeHandler}
 					closeOnDimmerClick={false}
-					onChange={this.onChange}
+					onChange={this.onChangeHandler}
 				>
 					<Modal.Header>Save marker as</Modal.Header>
 					<Modal.Content>
@@ -111,7 +110,7 @@ class Map extends Component {
 						</Modal.Description>
 					</Modal.Content>
 					<Modal.Actions>
-						<Button positive content="Add" onClick={this.close} />
+						<Button positive content="Add" onClick={this.closeHandler} />
 					</Modal.Actions>
 				</Modal>
 
@@ -141,4 +140,4 @@ const MapWithGeocode = compose(
 	withGoogleMap
 )(Map);
 
-export default connect()(MapWithGeocode);
+export default MapWithGeocode;

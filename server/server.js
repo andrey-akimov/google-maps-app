@@ -76,8 +76,11 @@ app.post('/registration', (req, res) => {
 					if (err) {
 						return console.log(err);
 					}
-					// console.log(token);
-					return res.json({ res: 'saved' });
+					return res.json({
+						res: 'saved',
+						authorization: 'Bearer ' + token,
+						login: product.login
+					});
 				});
 			});
 		});
@@ -99,8 +102,11 @@ app.post('/login', (req, res) => {
 						if (err) {
 							return console.log(err);
 						}
-						// console.log(token);
-						return res.json({ res: 'ok', authorization: 'Bearer ' + token });
+						return res.json({
+							res: 'ok',
+							authorization: 'Bearer ' + token,
+							login: docs.login
+						});
 					});
 				} else {
 					return res.json({ res: 'err' });

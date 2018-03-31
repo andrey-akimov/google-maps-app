@@ -25,38 +25,37 @@ class PageRegistration extends Component {
 		modalOpen: false
 	};
 
-	// CHECK PASSWORDS
 	checkPasswords = () => {
 		return this.state.password1.length > 2 && this.state.password2.length > 2;
 	};
 
-	// COMPARE PASSWORDS
 	comparePasswords = () => {
 		if (this.checkPasswords()) {
 			return this.state.password1 !== this.state.password2;
 		}
 	};
 
-	// CHECK LOGIN
 	checkLogin = () => {
 		return this.state.login.length > 2;
 	};
 
 	// HANDLERS
-	handleClose = () => this.setState({ modalOpen: false });
+	closeHandler = () => this.setState({ modalOpen: false });
 	loginHandler = e => {
 		this.setState({ login: e.target.value });
 	};
+
 	password1Handler = e => {
 		this.setState({ password1: e.target.value });
 	};
+
 	password2Handler = e => {
 		this.setState({ password2: e.target.value });
 	};
+
 	submitHandler(e) {
 		e.preventDefault();
-		const login = this.state.login;
-		const password = this.state.password1;
+		const { login, password1: password } = this.state;
 		if (!this.comparePasswords() && this.checkLogin()) {
 			this.setState({ loading: true });
 			axios
@@ -65,8 +64,9 @@ class PageRegistration extends Component {
 					password
 				})
 				.then(res => {
-					console.log(res.data);
 					if (res.data.res === 'saved') {
+						localStorage.setItem('jwt', res.data.authorization);
+						this.props.getLogin(res.data.login);
 						this.props.auth();
 						history.push('/map');
 					} else {
@@ -153,7 +153,7 @@ class PageRegistration extends Component {
 				{this.state.userExist ? (
 					<Modal
 						open={this.state.modalOpen}
-						onClose={this.handleClose}
+						onClose={this.closeHandler}
 						basic
 						size="small"
 						style={{ paddingTop: '40vh', margin: '0 auto 0 auto', marginTop: '0' }}
@@ -166,7 +166,7 @@ class PageRegistration extends Component {
 							</h2>
 						</Modal.Content>
 						<Modal.Actions>
-							<Button color="green" onClick={this.handleClose} inverted>
+							<Button color="green" onClick={this.closeHandler} inverted>
 								<Icon name="checkmark" /> Got it
 							</Button>
 						</Modal.Actions>

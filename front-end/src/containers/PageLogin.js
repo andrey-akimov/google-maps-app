@@ -5,7 +5,6 @@ import axios from 'axios';
 import history from '../history';
 
 class PageLogin extends Component {
-	// STATE
 	state = {
 		login: '',
 		password: '',
@@ -13,12 +12,10 @@ class PageLogin extends Component {
 		error: false
 	};
 
-	// CHECK PASSWORD
 	checkPasswords = () => {
 		return this.state.password.length > 2;
 	};
 
-	// CHECK LOGIN
 	checkLogin = () => {
 		return this.state.login.length > 2;
 	};
@@ -26,8 +23,7 @@ class PageLogin extends Component {
 	// HANDLERS
 	submitHandler = e => {
 		e.preventDefault();
-		const login = this.state.login;
-		const password = this.state.password;
+		const { login, password } = this.state;
 		if (this.checkPasswords() && this.checkLogin()) {
 			this.setState({ loading: true });
 			axios
@@ -36,9 +32,9 @@ class PageLogin extends Component {
 					password
 				})
 				.then(res => {
-					console.log(res.data);
 					if (res.data.res === 'ok') {
 						localStorage.setItem('jwt', res.data.authorization);
+						this.props.getLogin(res.data.login);
 						this.props.auth();
 						history.push('/map');
 					} else {
@@ -103,6 +99,7 @@ class PageLogin extends Component {
 						<Message>
 							New to us? <Link to="/registration">Sign Up</Link>
 						</Message>
+						{/* ERROR MESSAGE */}
 						{this.state.error ? (
 							<Message color="red">
 								<Icon name="attention" />
