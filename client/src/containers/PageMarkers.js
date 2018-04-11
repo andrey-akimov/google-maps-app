@@ -16,7 +16,7 @@ class Map extends Component {
 		this.setState({ open: false });
 
 		axios
-			.post('/map', {
+			.post('/api/map', {
 				token: localStorage.getItem('jwt'),
 				marker: {
 					position: {
@@ -71,7 +71,7 @@ class Map extends Component {
 	// CDM
 	componentDidMount() {
 		axios
-			.get('http://localhost:8000/map', {
+			.get('/api/map', {
 				params: { token: localStorage.getItem('jwt') }
 			})
 			.then(res => {

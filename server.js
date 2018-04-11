@@ -13,15 +13,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
-app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-});
-
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-	console.log(`Server started on port ${PORT}`);
-});
-
 // allow CORS requests
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -31,7 +22,7 @@ app.use((req, res, next) => {
 });
 
 // GET
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
 	NewUser.find({}, '_id login markers', (err, docs) => {
 		if (err) {
 			return res.send(err);
@@ -40,7 +31,7 @@ app.get('/', (req, res) => {
 	});
 });
 
-app.get('/map', verifyToken, (req, res) => {
+app.get('/api/map', verifyToken, (req, res) => {
 	jwt.verify(req.token, 'secretkey', (err, authData) => {
 		if (err) {
 			return res.json({ res: 'err' });
@@ -57,7 +48,7 @@ app.get('/map', verifyToken, (req, res) => {
 });
 
 // POST
-app.post('/registration', (req, res) => {
+app.post('/api/registration', (req, res) => {
 	NewUser.findOne({ login: req.body.login }, (err, docs) => {
 		if (err) {
 			return res.send(err);
@@ -95,7 +86,7 @@ app.post('/registration', (req, res) => {
 	});
 });
 
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
 	NewUser.findOne({ login: req.body.login }, (err, docs) => {
 		if (err) {
 			return res.send(err);
@@ -126,7 +117,7 @@ app.post('/login', (req, res) => {
 	});
 });
 
-app.post('/map', verifyToken, (req, res) => {
+app.post('/api/map', verifyToken, (req, res) => {
 	jwt.verify(req.token, 'secretkey', (err, authData) => {
 		if (err) {
 			return res.json({ res: 'err' });
@@ -156,3 +147,12 @@ function verifyToken(req, res, next) {
 		res.sendStatus(403);
 	}
 }
+
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+});
+
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+	console.log(`Server started on port ${PORT}`);
+});

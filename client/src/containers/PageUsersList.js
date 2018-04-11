@@ -19,7 +19,7 @@ class PageUsersList extends Component {
 	componentDidMount() {
 		this.setState({ loading: true });
 		axios
-			.get('/')
+			.get('/api')
 			.then(res => {
 				this.setState({
 					users: res.data,
