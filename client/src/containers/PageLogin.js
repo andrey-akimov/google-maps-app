@@ -27,7 +27,7 @@ class PageLogin extends Component {
 		if (this.checkPasswords() && this.checkLogin()) {
 			this.setState({ loading: true });
 			axios
-				.post('http://localhost:8000/login', {
+				.post('/login', {
 					login,
 					password
 				})

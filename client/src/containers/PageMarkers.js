@@ -16,7 +16,7 @@ class Map extends Component {
 		this.setState({ open: false });
 
 		axios
-			.post('http://localhost:8000/map', {
+			.post('/map', {
 				token: localStorage.getItem('jwt'),
 				marker: {
 					position: {

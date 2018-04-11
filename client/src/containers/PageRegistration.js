@@ -59,7 +59,7 @@ class PageRegistration extends Component {
 		if (!this.comparePasswords() && this.checkLogin()) {
 			this.setState({ loading: true });
 			axios
-				.post('http://localhost:8000/registration', {
+				.post('/registration', {
 					login,
 					password
 				})
